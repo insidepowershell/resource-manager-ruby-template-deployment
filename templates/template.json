@@ -124,6 +124,11 @@
     }
   },
   "variables": {
+    "vmavset": "[concat(parameters('datacenter'),'_',substring(parameters('environment'),0,1), '_', parameters('customerid'), '_', 'avset','_','01')]",
+    "ciscoavset": "[concat(parameters('datacenter'),'_',substring(parameters('environment'),0,1), '_', parameters('customerid'), '_', 'cisco','avset','_','01')]",
+    "dataavset": "[concat(parameters('datacenter'),'_',substring(parameters('environment'),0,1), '_', parameters('customerid'), '_', 'data','avset','_','01')]",
+    "appavset": "[concat(parameters('datacenter'),'_',substring(parameters('environment'),0,1), '_', parameters('customerid'), '_', 'app','avset','_','01')]",
+    "dmzavset": "[concat(parameters('datacenter'),'_',substring(parameters('environment'),0,1), '_', parameters('customerid'), '_', 'dmz','avset','_','01')]",
     "environment": "[substring(parameters('environment'),0,1)]",
     "networkname": "[concat(parameters('datacenter'),'_',substring(parameters('environment'),0,3), '_', parameters('customerid'), '_', 'vnt','_','01')]",
     "tagSettings": {
@@ -195,6 +200,23 @@
           "nsg": "[concat(variables('networkname'),'_','ad','_','nsg')]"
         }
       }
+    },
+    "availabilitySetSettings": {
+      "name": "[variables('vmavset')]",
+      "fdCount": 3,
+      "udCount": 5,
+      "name1": "[variables('ciscoavset')]",
+      "fdCount1": 3,
+      "udCount1": 5,
+      "name2": "[variables('dmzavset')]",
+      "fdCount2": 3,
+      "udCount2": 5,
+      "name3": "[variables('dataavset')]",
+      "fdCount3": 3,
+      "udCount3": 5,
+      "name4": "[variables('appavset')]",
+      "fdCount4": 3,
+      "udCount4": 5
     }
   },
   "resources": [
