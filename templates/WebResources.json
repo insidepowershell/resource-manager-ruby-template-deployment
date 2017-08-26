@@ -1,0 +1,84 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageSettings": {
+      "type": "object"
+    },
+    "tagSettings": {
+      "type": "object"
+    },
+    "availabilitySetSettings": {
+      "type": "object"
+    },
+    "networkSettings": {
+      "type": "object"
+    }
+  },
+  "variables": {
+    "CustomerUIDMGMTDFW": "136.40.226.32/28",
+    "CustomerUIDMGMTIAD": "66.55.5.224/32",
+    "CustomerUIDMGMTORD": "204.91.21.136/32",
+    "CustomerUIDMGMTHKG": "65.164.102.64/32",
+    "CustomerUIDMGMTLON": "93.152.104.96/32",
+    "CustomerUIDMGMTSYD": "180.87.74.132/32"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[parameters('availabilitySetSettings').name]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[resourceGroup().location]",
+
+      "properties": {
+        "platformFaultDomainCount": "[parameters('availabilitySetSettings').fdCount]",
+        "platformUpdateDomainCount": "[parameters('availabilitySetSettings').udCount]"
+      }
+    },
+    {
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[parameters('availabilitySetSettings').name1]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[resourceGroup().location]",
+
+      "properties": {
+        "platformFaultDomainCount": "[parameters('availabilitySetSettings').fdCount1]",
+        "platformUpdateDomainCount": "[parameters('availabilitySetSettings').udCount1]"
+      }
+    },
+    {
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[parameters('availabilitySetSettings').name2]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[resourceGroup().location]",
+
+      "properties": {
+        "platformFaultDomainCount": "[parameters('availabilitySetSettings').fdCount2]",
+        "platformUpdateDomainCount": "[parameters('availabilitySetSettings').udCount2]"
+      }
+    },
+    {
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[parameters('availabilitySetSettings').name3]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[resourceGroup().location]",
+
+      "properties": {
+        "platformFaultDomainCount": "[parameters('availabilitySetSettings').fdCount3]",
+        "platformUpdateDomainCount": "[parameters('availabilitySetSettings').udCount3]"
+      }
+    },
+    {
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[parameters('availabilitySetSettings').name4]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[resourceGroup().location]",
+
+      "properties": {
+        "platformFaultDomainCount": "[parameters('availabilitySetSettings').fdCount4]",
+        "platformUpdateDomainCount": "[parameters('availabilitySetSettings').udCount4]"
+      }
+    }
+  ],
+  "outputs": {}
+}

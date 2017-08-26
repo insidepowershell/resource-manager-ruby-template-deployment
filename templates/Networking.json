@@ -1,0 +1,1324 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "tagSettings": {
+      "type": "object"
+    },
+    "networkSettings": {
+      "type": "object"
+    }
+  },
+  "variables": {
+    "CustomerUIDMGMTDFW": "127.0.0.1/32",
+    "CustomerUIDMGMTIAD": "127.0.0.1/32",
+    "CustomerUIDMGMTORD": "127.0.0.1/32",
+    "CustomerUIDMGMTHKG": "127.0.0.1/32",
+    "CustomerUIDMGMTLON": "127.0.0.1/32",
+    "CustomerUIDMGMTSYD": "127.0.0.1/32"
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[parameters('networkSettings').subnets.dmz.nsg]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "NSG-DMZ"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Allow_LOCAL_SUBNET_INBOUND",
+            "properties": {
+              "description": "Allows intra-subnet communicaiton",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.dmz.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.dmz.prefix]",
+              "access": "Allow",
+              "priority": 3950,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_SuccessFactors_MGMT_RDP_INBOUND",
+            "properties": {
+              "description": "Allows RDP inbound from local MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.dmz.prefix]",
+              "access": "Allow",
+              "priority": 3951,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_SuccessFactors_MGMT_HTTPS_INBOUND",
+            "properties": {
+              "description": "Allows HTTPS inbound from local MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.dmz.prefix]",
+              "access": "Allow",
+              "priority": 3952,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_SuccessFactors_MGMT_SSH_INBOUND",
+            "properties": {
+              "description": "Allows SSH inbound from local MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.dmz.prefix]",
+              "access": "Allow",
+              "priority": 3953,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_AZURE_LB_INBOUND",
+            "properties": {
+              "description": "Allows inbound traffic from Azure Load Balancer",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "AzureLoadBalancer",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.dmz.prefix]",
+              "access": "Allow",
+              "priority": 3954,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Deny_ALL_INBOUND_UDP",
+            "properties": {
+              "description": "Deny all inbound UDP",
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 4000,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Deny_ALL_INBOUND_TCP",
+            "properties": {
+              "description": "Deny all inbound TCP",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 4001,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[parameters('networkSettings').subnets.app.nsg]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "NSG-APP"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Allow_LOCAL_SUBNET_INBOUND",
+            "properties": {
+              "description": "Allows intra-subnet communicaiton",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.app.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.app.prefix]",
+              "access": "Allow",
+              "priority": 3950,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_SuccessFactors_MGMT_RDP_INBOUND",
+            "properties": {
+              "description": "Allows RDP inbound from local SuccessFactors_MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.app.prefix]",
+              "access": "Allow",
+              "priority": 3951,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_SuccessFactors_MGMT_HTTPS_INBOUND",
+            "properties": {
+              "description": "Allows HTTPS inbound from local MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.app.prefix]",
+              "access": "Allow",
+              "priority": 3952,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_SuccessFactors_MGMT_SSH_INBOUND",
+            "properties": {
+              "description": "Allows SSH inbound from local SuccessFactors_MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.app.prefix]",
+              "access": "Allow",
+              "priority": 3953,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_AZURE_LB_INBOUND",
+            "properties": {
+              "description": "Allows SSH inbound from local SuccessFactors_MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "AzureLoadBalancer",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.app.prefix]",
+              "access": "Allow",
+              "priority": 3954,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Deny_ALL_INBOUND_UDP",
+            "properties": {
+              "description": "Deny all inbound UDP",
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 4000,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Deny_ALL_INBOUND_TCP",
+            "properties": {
+              "description": "Deny all inbound TCP",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 4001,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[parameters('networkSettings').subnets.data.nsg]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "NSG-Data"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Allow_LOCAL_SUBNET_INBOUND",
+            "properties": {
+              "description": "Allows intra-subnet communicaiton",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.data.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.data.prefix]",
+              "access": "Allow",
+              "priority": 3950,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_SuccessFactors_MGMT_RDP_INBOUND",
+            "properties": {
+              "description": "Allows RDP inbound from local SuccessFactors_MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.data.prefix]",
+              "access": "Allow",
+              "priority": 3951,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_SuccessFactors_MGMT_HTTPS_INBOUND",
+            "properties": {
+              "description": "Allows HTTPS inbound from local MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.data.prefix]",
+              "access": "Allow",
+              "priority": 3952,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_SuccessFactors_MGMT_SSH_INBOUND",
+            "properties": {
+              "description": "Allows SSH inbound from local SuccessFactors_MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.data.prefix]",
+              "access": "Allow",
+              "priority": 3953,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_AZURE_LB_INBOUND",
+            "properties": {
+              "description": "Allows SSH inbound from local SuccessFactors_MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "AzureLoadBalancer",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.data.prefix]",
+              "access": "Allow",
+              "priority": 3954,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Deny_ALL_INBOUND_UDP",
+            "properties": {
+              "description": "Deny all inbound UDP",
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 4000,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Deny_ALL_INBOUND_TCP",
+            "properties": {
+              "description": "Deny all inbound TCP",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 4001,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[parameters('networkSettings').subnets.quarantine.nsg]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "NSG-Quarantine"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Allow_LOCAL_SUBNET_INBOUND",
+            "properties": {
+              "description": "Allows intra-subnet communicaiton",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.quarantine.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.quarantine.prefix]",
+              "access": "Allow",
+              "priority": 3950,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_SuccessFactors_MGMT_RDP_INBOUND",
+            "properties": {
+              "description": "Allows RDP inbound from local SuccessFactors_MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.quarantine.prefix]",
+              "access": "Allow",
+              "priority": 3951,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_SuccessFactors_MGMT_HTTPS_INBOUND",
+            "properties": {
+              "description": "Allows HTTPS inbound from local MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.quarantine.prefix]",
+              "access": "Allow",
+              "priority": 3952,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_SuccessFactors_MGMT_SSH_INBOUND",
+            "properties": {
+              "description": "Allows SSH inbound from local SuccessFactors_MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.quarantine.prefix]",
+              "access": "Allow",
+              "priority": 3953,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_AZURE_LB_INBOUND",
+            "properties": {
+              "description": "Allows SSH inbound from local SuccessFactors_MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "AzureLoadBalancer",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.quarantine.prefix]",
+              "access": "Allow",
+              "priority": 3954,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Deny_ALL_INBOUND_UDP",
+            "properties": {
+              "description": "Deny all inbound UDP",
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 4000,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Deny_ALL_INBOUND_TCP",
+            "properties": {
+              "description": "Deny all inbound TCP",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 4001,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[parameters('networkSettings').subnets.gateway.nsg]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "NSG-Gateway"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Allow_LOCAL_SUBNET_INBOUND",
+            "properties": {
+              "description": "Allows intra-subnet communicaiton",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.gateway.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.gateway.prefix]",
+              "access": "Allow",
+              "priority": 3950,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_SuccessFactors_MGMT_RDP_INBOUND",
+            "properties": {
+              "description": "Allows RDP inbound from local SuccessFactors_MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.gateway.prefix]",
+              "access": "Allow",
+              "priority": 3951,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_SuccessFactors_MGMT_HTTPS_INBOUND",
+            "properties": {
+              "description": "Allows HTTPS inbound from local MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.gateway.prefix]",
+              "access": "Allow",
+              "priority": 3952,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_SuccessFactors_MGMT_SSH_INBOUND",
+            "properties": {
+              "description": "Allows SSH inbound from local SuccessFactors_MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.gateway.prefix]",
+              "access": "Allow",
+              "priority": 3953,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_AZURE_LB_INBOUND",
+            "properties": {
+              "description": "Allows SSH inbound from local SuccessFactors_MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "AzureLoadBalancer",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.gateway.prefix]",
+              "access": "Allow",
+              "priority": 3954,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Deny_ALL_INBOUND_UDP",
+            "properties": {
+              "description": "Deny all inbound UDP",
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 4000,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Deny_ALL_INBOUND_TCP",
+            "properties": {
+              "description": "Deny all inbound TCP",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 4001,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[parameters('networkSettings').subnets.ad.nsg]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "NSG-AD"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Allow_TCP_UDP_53",
+            "properties": {
+              "description": "Allow UDP 53",
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "53",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3900,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_TCP_UDP_88",
+            "properties": {
+              "description": "Allow TCP and UDP 88",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "88",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3901,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_UDP_123",
+            "properties": {
+              "description": "Allow UDP 123",
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "123",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3902,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_TCP_135",
+            "properties": {
+              "description": "Allow TCP 135",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "135",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3903,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_TCP_UDP_137",
+            "properties": {
+              "description": "Allow TCP and UDP 137",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "137",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3904,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_UDP_138",
+            "properties": {
+              "description": "Allow TCP 138",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "138",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3905,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_TCP_139",
+            "properties": {
+              "description": "Allow TCP 139",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "139",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3906,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_TCP_UDP_389",
+            "properties": {
+              "description": "Allow TCP and UDP 389",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "389",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3907,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_TCP_UDP_445",
+            "properties": {
+              "description": "Allow TCP and UDP 445",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "445",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3908,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_TCP_UDP_464",
+            "properties": {
+              "description": "Allow TCP and UDP 464",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "464",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3909,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_TCP_636",
+            "properties": {
+              "description": "Allow TCP 636",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "636",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3910,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_TCP_3268",
+            "properties": {
+              "description": "Allow TCP 3268",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3268",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3911,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_TCP_3269",
+            "properties": {
+              "description": "Allow TCP 3269",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3269",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3912,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_TCP_5722",
+            "properties": {
+              "description": "Allow TCP 5722",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "5722",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3913,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_TCP_UDP_49152_65535",
+            "properties": {
+              "description": "Allow TCP and UDP 49152_65535",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "49152-65535",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3914,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_TCP_9389",
+            "properties": {
+              "description": "Allow TCP 9389",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "9389",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3915,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_LOCAL_VNET_INBOUND",
+            "properties": {
+              "description": "Allows intra-VNET communicaiton",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3949,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_LOCAL_SUBNET_INBOUND",
+            "properties": {
+              "description": "Allows intra-subnet communicaiton",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3950,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_SuccessFactors_MGMT_RDP_INBOUND",
+            "properties": {
+              "description": "Allows RDP inbound from local SuccessFactors_MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3951,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_SuccessFactors_MGMT_HTTPS_INBOUND",
+            "properties": {
+              "description": "Allows HTTPS inbound from local MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3952,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_SuccessFactors_MGMT_SSH_INBOUND",
+            "properties": {
+              "description": "Allows SSH inbound from local SuccessFactors_MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3953,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_AZURE_LB_INBOUND",
+            "properties": {
+              "description": "Allows SSH inbound from local SuccessFactors_MGMT subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "AzureLoadBalancer",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "access": "Allow",
+              "priority": 3954,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Deny_ALL_INBOUND_UDP",
+            "properties": {
+              "description": "Deny all inbound UDP",
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 4000,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Deny_ALL_INBOUND_TCP",
+            "properties": {
+              "description": "Deny all inbound TCP",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 4001,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[parameters('networkSettings').subnets.mgmt.nsg]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "NSG-MGMT"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Allow_LOCAL_SUBNET_INBOUND",
+            "properties": {
+              "description": "Allows intra-subnet communicaiton",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "access": "Allow",
+              "priority": 3950,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_ALL_RDP_DFW",
+            "properties": {
+              "description": "Allows RDP",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "[variables('CustomerUIDMGMTDFW')]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "access": "Allow",
+              "priority": 3951,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_ALL_RDP_IAD",
+            "properties": {
+              "description": "Allows RDP",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "[variables('CustomerUIDMGMTIAD')]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "access": "Allow",
+              "priority": 3952,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_ALL_RDP_ORD",
+            "properties": {
+              "description": "Allows RDP",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "[variables('CustomerUIDMGMTORD')]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "access": "Allow",
+              "priority": 3953,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_ALL_RDP_HKG",
+            "properties": {
+              "description": "Allows RDP",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "[variables('CustomerUIDMGMTHKG')]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "access": "Allow",
+              "priority": 3954,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_ALL_RDP_LON",
+            "properties": {
+              "description": "Allows RDP",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "[variables('CustomerUIDMGMTLON')]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "access": "Allow",
+              "priority": 3955,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_ALL_RDP_SYD",
+            "properties": {
+              "description": "Allows RDP",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "[variables('CustomerUIDMGMTSYD')]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "access": "Allow",
+              "priority": 3956,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_ALL_SSH_DFW",
+            "properties": {
+              "description": "Allows SSH",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "[variables('CustomerUIDMGMTDFW')]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "access": "Allow",
+              "priority": 3957,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_ALL_SSH_IAD",
+            "properties": {
+              "description": "Allows SSH",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "[variables('CustomerUIDMGMTIAD')]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "access": "Allow",
+              "priority": 3958,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_ALL_SSH_ORD",
+            "properties": {
+              "description": "Allows SSH",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "[variables('CustomerUIDMGMTORD')]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "access": "Allow",
+              "priority": 3959,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_ALL_SSH_HKG",
+            "properties": {
+              "description": "Allows SSH",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "[variables('CustomerUIDMGMTHKG')]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "access": "Allow",
+              "priority": 3960,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_ALL_SSH_LON",
+            "properties": {
+              "description": "Allows SSH",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "[variables('CustomerUIDMGMTLON')]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "access": "Allow",
+              "priority": 3961,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_ALL_SSH_SYD",
+            "properties": {
+              "description": "Allows SSH",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "[variables('CustomerUIDMGMTSYD')]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "access": "Allow",
+              "priority": 3962,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_ALL_HTTPS_DFW",
+            "properties": {
+              "description": "Allows HTTPS",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "[variables('CustomerUIDMGMTDFW')]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "access": "Allow",
+              "priority": 3963,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_ALL_HTTPS_IAD",
+            "properties": {
+              "description": "Allows HTTPS",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "[variables('CustomerUIDMGMTIAD')]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "access": "Allow",
+              "priority": 3964,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_ALL_HTTPS_ORD",
+            "properties": {
+              "description": "Allows HTTPS",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "[variables('CustomerUIDMGMTORD')]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "access": "Allow",
+              "priority": 3965,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_ALL_HTTPS_HKG",
+            "properties": {
+              "description": "Allows HTTPS",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "[variables('CustomerUIDMGMTHKG')]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "access": "Allow",
+              "priority": 3966,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_ALL_HTTPS_LON",
+            "properties": {
+              "description": "Allows HTTPS",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "[variables('CustomerUIDMGMTLON')]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "access": "Allow",
+              "priority": 3967,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_ALL_HTTPS_SYD",
+            "properties": {
+              "description": "Allows HTTPS",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "[variables('CustomerUIDMGMTSYD')]",
+              "destinationAddressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "access": "Allow",
+              "priority": 3968,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Deny_ALL_INBOUND_UDP",
+            "properties": {
+              "description": "Deny all inbound UDP",
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 4000,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Deny_ALL_INBOUND_TCP",
+            "properties": {
+              "description": "Deny all inbound TCP",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 4001,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('networkSettings').vnetName]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+
+      }
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSettings').subnets.dmz.nsg)]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSettings').subnets.data.nsg)]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSettings').subnets.app.nsg)]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSettings').subnets.quarantine.nsg)]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSettings').subnets.gateway.nsg)]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSettings').subnets.mgmt.nsg)]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSettings').subnets.ad.nsg)]"
+      ],
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('networkSettings').addressPrefix]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[parameters('networkSettings').subnets.dmz.name]",
+            "properties": {
+              "addressPrefix": "[parameters('networkSettings').subnets.dmz.prefix]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSettings').subnets.dmz.nsg)]"
+              }
+            }
+          },
+          {
+            "name": "[parameters('networkSettings').subnets.data.name]",
+            "properties": {
+              "addressPrefix": "[parameters('networkSettings').subnets.data.prefix]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSettings').subnets.data.nsg)]"
+              }
+            }
+          },
+          {
+            "name": "[parameters('networkSettings').subnets.app.name]",
+            "properties": {
+              "addressPrefix": "[parameters('networkSettings').subnets.app.prefix]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSettings').subnets.app.nsg)]"
+              }
+            }
+          },
+          {
+            "name": "[parameters('networkSettings').subnets.quarantine.name]",
+            "properties": {
+              "addressPrefix": "[parameters('networkSettings').subnets.quarantine.prefix]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSettings').subnets.quarantine.nsg)]"
+              }
+            }
+          },
+          {
+            "name": "[parameters('networkSettings').subnets.gateway.name]",
+            "properties": {
+              "addressPrefix": "[parameters('networkSettings').subnets.gateway.prefix]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSettings').subnets.gateway.nsg)]"
+              }
+            }
+          },
+          {
+            "name": "[parameters('networkSettings').subnets.mgmt.name]",
+            "properties": {
+              "addressPrefix": "[parameters('networkSettings').subnets.mgmt.prefix]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSettings').subnets.mgmt.nsg)]"
+              }
+            }
+          },
+          {
+            "name": "[parameters('networkSettings').subnets.ad.name]",
+            "properties": {
+              "addressPrefix": "[parameters('networkSettings').subnets.ad.prefix]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSettings').subnets.ad.nsg)]"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {}
+}
