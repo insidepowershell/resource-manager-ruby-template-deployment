@@ -207,7 +207,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/insidepowershell/resource-manager-ruby-template-deployment/blob/master/templates/dcs.json",
+          "uri": "https://raw.githubusercontent.com/insidepowershell/resource-manager-ruby-template-deployment/master/templates/dcs.json",
           "contentVersion": "1.0.0.0"
         }
       }
