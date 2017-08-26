@@ -110,7 +110,7 @@
     },
     "builddate": {
       "type": "string",
-      "defaultValue": "08212017",
+      "defaultValue": "08212018",
       "metadata": {
         "description": "DataCenter allowable values for Segment 1."
       }
@@ -210,13 +210,9 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://github.com/insidepowershell/resource-manager-ruby-template-deployment/blob/master/templates/dc.json",
+          "uri": "https://raw.githubusercontent.com/insidepowershell/resource-manager-ruby-template-deployment/blob/master/templates/dc.json",
           "contentVersion": "1.0.0.0"
         },
-        "parametersLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('TemplateFolder'),'/', substring(parameters('environment'),0,3), '/', variables('TemplateParametersFileName'), parameters('_artifactsLocationSasToken'))]",
-          "contentVersion": "1.0.0.0"
-        }
       }
     },
     {
@@ -228,7 +224,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://github.com/insidepowershell/resource-manager-ruby-template-deployment/blob/master/templates/Networking.json",
+          "uri": "https://raw.githubusercontent.com/insidepowershell/resource-manager-ruby-template-deployment/master/templates/Networking.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -250,7 +246,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://github.com/insidepowershell/resource-manager-ruby-template-deployment/blob/master/templates/webresources.json",
+          "uri": "https://raw.githubusercontent.com/insidepowershell/resource-manager-ruby-template-deployment/master/templates/webresources.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
