@@ -1,7 +1,7 @@
 ---
 services: azure-resource-manager
 platforms: ruby
-author: hocavazo\` `\
+author: hocavazo
 ---
 
 [![Build Status](https://travis-ci.org/Azure-Samples/resource-manager-ruby-template-deployment.svg?branch=master)](https://travis-ci.org/Azure-Samples/resource-manager-ruby-template-deployment)
@@ -47,9 +47,9 @@ each the Tenant Id, Client Id and Client Secret from creating the Service Princi
 - `git clone https://github.com/insidepowershell/resource-manager-ruby-template-deployment.git`
 - `cd resource-manager-ruby-template-deployment`
 - `bundle install`
-- `export AZURE_TENANT_ID=`your tenant id``
-- `export AZURE_CLIENT_ID=`your client id``
-- `export AZURE_CLIENT_SECRET=`your client secret``
+- `export AZURE_TENANT_ID={your tenant id}`
+- `export AZURE_CLIENT_ID={your client id}`
+- `export AZURE_CLIENT_SECRET={your client secret}`
 - `bundle exec ruby azure_deployment.rb`
 
 ### What is this azure_deployment.rb Doing?
@@ -91,6 +91,7 @@ Beginning the deployment...
 Done deploying!!
 
 ```
+
 
 
 ### How to enable logs and retrieve operation logs? 
