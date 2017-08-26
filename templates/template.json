@@ -2,97 +2,203 @@
   "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "adminUserName": {
+    "appowner": {
       "type": "string",
-      "defaultValue": "azureSample",
+      "defaultValue": "SDO",
+      "allowedValues": [
+        "SDO",
+        "RTO",
+        "Who"
+      ],
       "metadata": {
-        "description": "User name for the Virtual Machine."
+        "description": "DataCenter allowable values for Segment 1."
       }
     },
-    "sshKeyData": {
+    "datacenter": {
       "type": "string",
+      "defaultValue": "m",
+      "allowedValues": [
+        "m",
+        "a",
+        "o"
+      ],
       "metadata": {
-        "description": "SSH rsa public key file as a string."
+        "description": "DataCenter allowable values for Segment 1."
       }
     },
-    "dnsLabelPrefix": {
+    "customerid": {
       "type": "string",
+      "defaultValue": "alls",
       "metadata": {
-        "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
+        "description": "DataCenter allowable values for Segment 3."
       }
     },
-    "vmSize": {
+    "environment": {
       "type": "string",
-      "defaultValue": "Standard_D2",
+      "defaultValue": "development",
+      "allowedValues": [
+        "development",
+        "test",
+        "production"
+      ],
       "metadata": {
-        "description": "Size of the VM"
+        "description": "Environment allowable values for Segment 2."
       }
     },
-    "vmName": {
+    "deployDCs": {
       "type": "string",
+      "defaultValue": "true",
+      "allowedValues": [
+        "false",
+        "true"
+      ],
       "metadata": {
-        "description": "Name of the VM"
+        "description": "This parameter controls the DC deployment."
       }
     },
-    "imagePublisher": {
+    "deployNetworking": {
       "type": "string",
-      "defaultValue": "canonical",
+      "defaultValue": "true",
+      "allowedValues": [
+        "false",
+        "true"
+      ],
       "metadata": {
-        "description": "Name of the image publisher"
+        "description": "This parameter controls the DC deployment."
       }
     },
-    "imageOffer": {
+    "deployWebResources": {
       "type": "string",
-      "defaultValue": "ubuntuserver",
+      "defaultValue": "true",
+      "allowedValues": [
+        "false",
+        "true"
+      ],
       "metadata": {
-        "description": "Name of the image offer"
+        "description": "This parameter controls the DC deployment."
       }
     },
-    "imageSku": {
+    "applicationid": {
       "type": "string",
-      "defaultValue": "16.04.0-LTS",
+      "defaultValue": "dbmotion",
       "metadata": {
-        "description": "Name of the image sku"
+        "description": "DataCenter allowable values for Segment 4."
       }
     },
-    "imageVersion": {
+    "departmentname": {
       "type": "string",
-      "defaultValue": "latest",
+      "defaultValue": "Hosting",
+      "allowedValues": [
+        "Hosting",
+        "CareManager",
+        "Sunrise"
+      ],
       "metadata": {
-        "description": "Name of the image sku"
+        "description": "DataCenter allowable values for Segment 1."
       }
     },
-    "subnetName": {
+    "buildid": {
       "type": "string",
-      "defaultValue": "azsample-subnet",
+      "defaultValue": "internalbuildcode",
+      "allowedValues": [
+        "internalbuildcode",
+        "externalbuildcode"
+      ],
       "metadata": {
-        "description": "Name of the subnet"
+        "description": "DataCenter allowable values for Segment 1."
       }
     },
-    "virtualNetworkName": {
+    "builddate": {
       "type": "string",
-      "defaultValue": "azsampleVNET",
+      "defaultValue": "08212017",
       "metadata": {
-        "description": "Name of the virtual network"
+        "description": "DataCenter allowable values for Segment 1."
       }
+    },
+    "_artifactsLocation": {
+      "type": "string",
+      "defaultValue": "https://armdeployscripts888.blob.core.windows.net",
+      "metadata": {
+        "description": "artifacts storage url"
+      }
+    },
+    "_artifactsLocationSasToken": {
+      "type": "securestring"
     }
   },
   "variables": {
-    "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'azsample')]",
-    "location": "[resourceGroup().location]",
-    "osDiskName": "osDisk1",
-    "addressPrefix": "10.0.0.0/16",
-    "subnetPrefix": "10.0.0.0/24",
-    "vmStorageAccountContainerName": "azsample-vhds",
-    "nicName": "[concat(parameters('vmName'), '-azsampleNIC')]",
-    "publicIPAddressName": "[concat(parameters('vmName'), '-azsamplePublicIP')]",
-    "publicIPAddressType": "Dynamic",
-    "storageAccountType": "Standard_LRS",
-    "networkSecurityGroupName": "[concat(parameters('vmName'), '-azsampleNSG')]",
-    "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
-    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
-    "subnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetName'))]",
-    "apiVersion": "2015-06-15"
+    "environment": "[substring(parameters('environment'),0,1)]",
+    "networkname": "[concat(parameters('datacenter'),'_',substring(parameters('environment'),0,3), '_', parameters('customerid'), '_', 'vnt','_','01')]",
+    "tagSettings": {
+      "Department": "[parameters('departmentName')]",
+      "ApplicationID": "[parameters('applicationid')]",
+      "Environment": "[parameters('environment')]"
+    },
+    "tagSettings2": {
+      "gen": {
+        "DepartmentID": "[parameters('departmentName')]",
+        "ApplicationID": "[parameters('applicationid')]",
+        "EnvironmentID": "[parameters('environment')]",
+        "AppOwnerID": "[parameters('appowner')]",
+        "BuildID": "[parameters('buildid')]",
+        "BuildDate": "[parameters('builddate')]"
+      }
+    },
+    "TemplateFolder": "nestedtemplates",
+    "TemplateFileNames": [
+      "dcs.json",
+      "Networking.json",
+      "WebResources.json"
+    ],
+    "TemplateParametersFileName": "dcs.parameters.json",
+    "networkSettings": {
+      "vnetName": "[variables('networkname')]",
+      "addressPrefix": "172.16.200.0/22",
+      "subnets": {
+        "dmz": {
+          "name": "[concat(variables('networkname'),'_','dmz','_','subnet')]",
+          "prefix": "172.16.200.0/24",
+          "vnet": "[variables('networkname')]",
+          "nsg": "[concat(variables('networkname'),'_','dmz','_','nsg')]"
+        },
+        "data": {
+          "name": "[concat(variables('networkname'),'_','data','_','subnet')]",
+          "prefix": "172.16.202.0/24",
+          "vnet": "[variables('networkname')]",
+          "nsg": "[concat(variables('networkname'),'_','data','_','nsg')]"
+        },
+        "app": {
+          "name": "[concat(variables('networkname'),'_','app','_','subnet')]",
+          "prefix": "172.16.201.0/24",
+          "vnet": "[variables('networkname')]",
+          "nsg": "[concat(variables('networkname'),'_','app','_','nsg')]"
+        },
+        "quarantine": {
+          "name": "[concat(variables('networkname'),'_','quarantine','_','subnet')]",
+          "prefix": "172.16.203.16/28",
+          "vnet": "[variables('networkname')]",
+          "nsg": "[concat(variables('networkname'),'_','quarantine','_','nsg')]"
+        },
+        "gateway": {
+          "name": "GatewaySubnet",
+          "prefix": "172.16.203.32/28",
+          "vnet": "[variables('networkname')]",
+          "nsg": "[concat(variables('networkname'),'_','gateway','_','nsg')]"
+        },
+        "mgmt": {
+          "name": "[concat(variables('networkname'),'_','mgmt','_','subnet')]",
+          "prefix": "172.16.203.48/28",
+          "vnet": "[variables('networkname')]",
+          "nsg": "[concat(variables('networkname'),'_','mgmt','_','nsg')]"
+        },
+        "ad": {
+          "name": "[concat(variables('networkname'),'_','ad','_','subnet')]",
+          "prefix": "172.16.203.0/28",
+          "vnet": "[variables('networkname')]",
+          "nsg": "[concat(variables('networkname'),'_','ad','_','nsg')]"
+        }
+      }
+    }
   },
   "resources": [
     {
