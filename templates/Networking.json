@@ -1233,7 +1233,7 @@
       "location": "[resourceGroup().location]",
       "tags": {
 
-      }
+      },
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSettings').subnets.dmz.nsg)]",
         "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSettings').subnets.data.nsg)]",
