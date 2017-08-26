@@ -8,7 +8,7 @@ require_relative 'lib/deployer'
 # AZURE_CLIENT_SECRET: with your Azure Active Directory Application Secret
 
 my_subscription_id = ENV['AZURE_SUBSCRIPTION_ID'] || '11111111-1111-1111-1111-111111111111'   # your Azure Subscription Id
-my_resource_group = 'azure-ruby-deployment-sample'            # the resource group for deployment
+my_resource_group = 'azure-ruby-deployment-sample888'            # the resource group for deployment
 my_pub_ssh_key_path = File.expand_path('~/.ssh/id_rsa.pub')   # the path to your rsa public key file
 
 msg = "\nInitializing the Deployer class with subscription id: #{my_subscription_id}, resource group: #{my_resource_group}"

@@ -4,7 +4,7 @@ require 'azure_mgmt_resources'
 class Deployer
   DEPLOYMENT_PARAMETERS = {
       dnsLabelPrefix:       Haikunator.haikunate(100),
-      vmName:               'azure-deployment-sample-vm'
+      vmName:               'azure-deployment-sample-vmxxx'
   }
 
   # Initialize the deployer class with subscription, resource group and public key. The class will raise an
