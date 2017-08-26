@@ -34,7 +34,7 @@ Deployments
 Networking - deploys a network, 7 subnets, and 7 network security groups with a dependency on the network security groups. Meaning, the
  the Network and Subnet will not deploy until the network security groups have been deployed.
 WebResources - deploys 5 availability sets with a uniquely defined naming convention.
-DCs - is a blank deployment. No resources are deployed. 
+DCs - this is a deployment of blank templates. You'll need to define this deployment on your own.
 
 [here][Template].
 
@@ -44,12 +44,12 @@ You will need to create an Azure service principal either through Azure CLI, Pow
 each the Tenant Id, Client Id and Client Secret from creating the Service Principal for use below.
 
 - [Create a Service Principal][ServicePrincipalCreation]
-- `git clone https://github.com/Azure-Samples/resource-manager-ruby-template-deployment.git`
+- `git clone https://github.com/insidepowershell/resource-manager-ruby-template-deployment.git`
 - `cd resource-manager-ruby-template-deployment`
 - `bundle install`
-- `export AZURE_TENANT_ID={your tenant id}`
-- `export AZURE_CLIENT_ID={your client id}`
-- `export AZURE_CLIENT_SECRET={your client secret}`
+- `export AZURE_TENANT_ID=`your tenant id``
+- `export AZURE_CLIENT_ID=`your client id``
+- `export AZURE_CLIENT_SECRET=`your client secret``
 - `bundle exec ruby azure_deployment.rb`
 
 ### What is this azure_deployment.rb Doing?
@@ -90,10 +90,8 @@ Beginning the deployment...
 
 Done deploying!!
 
-You can connect via: `ssh azureSample@damp-dew-79.westus.cloudapp.azure.com`
 ```
 
-You should be able to run `ssh azureSample@{your dns value}.westus.cloudapp.azure.com` to connect to your new VM.
 
 ### How to enable logs and retrieve operation logs? 
 
