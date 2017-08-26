@@ -1,7 +1,7 @@
 ---
 services: azure-resource-manager
 platforms: ruby
-author: hocavazo
+author: hocavazo\` `\
 ---
 
 [![Build Status](https://travis-ci.org/Azure-Samples/resource-manager-ruby-template-deployment.svg?branch=master)](https://travis-ci.org/Azure-Samples/resource-manager-ruby-template-deployment)
