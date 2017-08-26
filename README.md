@@ -1,12 +1,12 @@
 ---
 services: azure-resource-manager
 platforms: ruby
-author: devigned
+author: hocavazo
 ---
 
 [![Build Status](https://travis-ci.org/Azure-Samples/resource-manager-ruby-template-deployment.svg?branch=master)](https://travis-ci.org/Azure-Samples/resource-manager-ruby-template-deployment)
 
-# Deploy an SSH Enabled VM with a Template in Ruby
+# Nested Template Deployment: Networking Components, Availability Sets, and Mock Domain Controllers (blank deployment).
 
 This sample explains how to use Azure Resource Manager templates to deploy your Resources to Azure. It shows how to
 deploy your Resources by using the Azure SDK for Ruby.
@@ -14,7 +14,7 @@ deploy your Resources by using the Azure SDK for Ruby.
 When deploying an application definition with a template, you can provide parameter values to customize how the
 resources are created. You specify values for these parameters either inline or in a parameter file.
 
-## Incremental and complete deployments
+## Incremental Deployments Only 
 
 By default, Resource Manager handles deployments as incremental updates to the resource group. With incremental
 deployment, Resource Manager:
@@ -23,20 +23,19 @@ deployment, Resource Manager:
 - adds resources that are specified in the template but do not exist in the resource group
 - does not re-provision resources that exist in the resource group in the same condition defined in the template
 
-With complete deployment, Resource Manager:
-
-- deletes resources that exist in the resource group but are not specified in the template
-- adds resources that are specified in the template but do not exist in the resource group
-- does not re-provision resources that exist in the resource group in the same condition defined in the template
-
-You specify the type of deployment through the Mode property, as shown in the examples below.
+Nested Templates do not support Complete Mode.
 
 ## Deploy with Ruby
 
-In this sample, we are going to deploy a resource template which contains an Ubuntu 16.04 LTS virtual machine using
-ssh public key authentication, storage account, and virtual network with public IP address. The virtual network
-contains a single subnet with a single network security group rule which allows traffic on port 22 for ssh with a single
-network interface belonging to the subnet. The virtual machine is a `Standard_D1` size. You can find the template
+In this sample, we use the parent template to define and deploy 3 specific resource deployments. The resource deployments are 
+defined as Networking, WebResources, and DCs. Each resource deployment has a separate set of parameters and a template link uri.
+
+Deployments
+Networking - deploys a network, 7 subnets, and 7 network security groups with a dependency on the network security groups. Meaning, the
+ the Network and Subnet will not deploy until the network security groups have been deployed.
+WebResources - deploys 5 availability sets with a uniquely defined naming convention.
+DCs - is a blank deployment. No resources are deployed. 
+
 [here][Template].
 
 ### To run this sample, do the following:

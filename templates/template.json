@@ -266,6 +266,9 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "availabilitySetSettings": {
+            "value": "[variables('availabilitySetSettings')]"
+          },
           "networkSettings": {
             "value": "[variables('networkSettings')]"
           }
