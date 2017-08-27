@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See License.txt in the project root for license information.
 
 $: << File.expand_path('../lib')
-require 'vcr'
+#require 'vcr'
 require 'dotenv'
 require 'climate_control'
 
@@ -89,4 +89,3 @@ RSpec.configure do |config|
     end
   end
 end
-

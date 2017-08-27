@@ -1,10 +1,10 @@
-require 'haikunator'
+#require 'haikunator'
 require 'azure_mgmt_resources'
 
 class Deployer
   DEPLOYMENT_PARAMETERS = {
-      dnsLabelPrefix:       Haikunator.haikunate(100),
-      vmName:               'azure-deployment-sample-vmxxx'
+#      dnsLabelPrefix:       Haikunator.haikunate(100),
+ #     vmName:               'azure-deployment-sample-vmxxx'
   }
 
   # Initialize the deployer class with subscription, resource group and public key. The class will raise an
@@ -14,11 +14,11 @@ class Deployer
   # @param [String] subscription_id the subscription to deploy the template
   # @param [String] resource_group the resource group to create or update and then deploy the template
   # @param [String] pub_ssh_key_path the path to the public key to be used to authentication
-  def initialize(subscription_id, resource_group, pub_ssh_key_path = File.expand_path('~/.ssh/id_rsa.pub'))
+  def initialize(subscription_id, resource_group )
     @resource_group = resource_group
     @subscription_id = subscription_id
-    raise ArgumentError.new("The path: #{pub_ssh_key_path} does not exist.") unless File.exist?(pub_ssh_key_path)
-    @pub_ssh_key = File.read(pub_ssh_key_path)
+#    raise ArgumentError.new("The path: #{pub_ssh_key_path} does not exist.") unless File.exist?(pub_ssh_key_path)
+#    @pub_ssh_key = File.read(pub_ssh_key_path)
     provider = MsRestAzure::ApplicationTokenProvider.new(
         ENV['AZURE_TENANT_ID'],
         ENV['AZURE_CLIENT_ID'],
@@ -44,8 +44,8 @@ class Deployer
     deployment.properties.mode = Azure::ARM::Resources::Models::DeploymentMode::Incremental
 
     # build the deployment template parameters from Hash to {key: {value: value}} format
-    deploy_params = DEPLOYMENT_PARAMETERS.merge(sshKeyData: @pub_ssh_key)
-    deployment.properties.parameters = Hash[*deploy_params.map{ |k, v| [k,  {value: v}] }.flatten]
+ #   deploy_params = DEPLOYMENT_PARAMETERS.merge(sshKeyData: @pub_ssh_key)
+ #   deployment.properties.parameters = Hash[*deploy_params.map{ |k, v| [k,  {value: v}] }.flatten]
 
     # log the request and response contents of Template Deployment.
     # By default, ARM does not log any content. By logging information about the request or response, you could
@@ -80,9 +80,9 @@ class Deployer
     @client.resource_groups.delete(@resource_group)
   end
 
-  def dns_prefix
-    DEPLOYMENT_PARAMETERS[:dnsLabelPrefix]
-  end
+#  def dns_prefix
+#    DEPLOYMENT_PARAMETERS[:dnsLabelPrefix]
+#  end
 
   def print_properties(resource)
     puts "\tProperties:"
