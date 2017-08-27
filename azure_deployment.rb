@@ -1,3 +1,6 @@
+require_relative 'lib/deployer'
+
+
 # This script expects that the following environment vars are set:
 #
 # AZURE_TENANT_ID: with your Azure Active Directory tenant id or domain
